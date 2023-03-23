@@ -1,6 +1,6 @@
 import pytest
 
-from webtrends.skeleton import fib, main
+from frontpage.skeleton import fib, main
 
 __author__ = "Afraz Ahmadzadeh"
 __copyright__ = "Afraz Ahmadzadeh"

@@ -1,5 +1,5 @@
 """
-    Setup file for webtrends.
+    Setup file for frontpage.
     Use setup.cfg to configure your project.
 
     This file was generated with PyScaffold 4.3.1.
