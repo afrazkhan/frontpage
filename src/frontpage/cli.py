@@ -15,7 +15,7 @@ __license__ = "MIT"
 
 log_level = 'WARN'
 logging.basicConfig(format='%(levelname)s: %(message)s', level=log_level)
-logger = logging.getLogger(log_level)
+logger = logging.getLogger(log_level).setLevel(log_level)
 config = configuration.get_config(logger)
 
 @click.group()

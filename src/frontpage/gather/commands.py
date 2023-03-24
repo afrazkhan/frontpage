@@ -3,13 +3,16 @@ TODO
 """
 
 import click
+import logging
 
 @click.group
 @click.pass_context
 def gather(ctx): # pylint: disable=unused-argument
     """ Commands for gathering information around the web """
 
-    pass # pylint: disable=unnecessary-pass
+    logger = logging.getLogger(ctx.obj['config']['log_level'])
+    logger.setLevel(ctx.obj['config']['log_level'])
+    ctx.obj['logger'] = logger
 
 @gather.command()
 @click.option("--country-code", "-c", multiple=True, default=['GB', 'NL'], help="Country code for where to get info from. Can be given multipled times")
@@ -28,4 +31,4 @@ def weather(ctx, city, coords):
     """ Weather """
 
     from frontpage.gather import weather as this_weather
-    print(this_weather.main(ctx.obj['config'], city, coords))
+    print(this_weather.main(ctx.obj['config'], ctx.obj['logger'], city, coords))
