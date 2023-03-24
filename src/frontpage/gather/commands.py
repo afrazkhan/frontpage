@@ -18,17 +18,18 @@ def gather(ctx): # pylint: disable=unused-argument
 @click.option("--country-code", "-c", multiple=True, default=['GB', 'NL'], help="Country code for where to get info from. Can be given multipled times")
 @click.pass_context
 def google(ctx, country_code):
-    """ Look up security groups associated with [hostname], and add port allowances for this machine's IP """
+    """ Get the latest search trends """
 
-    from frontpage.gather import google as this_google
-    print(this_google.main(ctx.obj['config'], country_code))
+    from frontpage.gather.google import Google
+    this_google = Google(ctx.obj['logger'], ctx.obj['config'], country_code)
+    print(this_google.get_trends())
 
 @gather.command()
 @click.option("--city", "-c", default=None, help="City to get weather for")
 @click.option("--coords", "-o", default=None, help="Give latitude and logitude as'lat,lon'")
 @click.pass_context
 def weather(ctx, city, coords):
-    """ Weather """
+    """ Show the current weather """
 
     from frontpage.gather.weather import Weather
     this_weather = Weather(ctx.obj['logger'], ctx.obj['config'], city, coords)
