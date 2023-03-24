@@ -30,5 +30,6 @@ def google(ctx, country_code):
 def weather(ctx, city, coords):
     """ Weather """
 
-    from frontpage.gather import weather as this_weather
-    print(this_weather.main(ctx.obj['config'], ctx.obj['logger'], city, coords))
+    from frontpage.gather.weather import Weather
+    this_weather = Weather(ctx.obj['logger'], ctx.obj['config'], city, coords)
+    print(this_weather.get_weather())
