@@ -43,5 +43,5 @@ class Weather():
             self.logger.debug('coords not found in arguments, using get_coords()')
             coords = self.get_coords(self.config, city)
 
-        response = requests.get(f"https://api.openweathermap.org/data/2.5/weather?lat={coords[0]}&lon={coords[1]}&appid={self.openweather_token}").json()
+        response = requests.get(f"https://api.openweathermap.org/data/2.5/weather?lat={coords[0]}&lon={coords[1]}&appid={self.openweather_token}&units=metric").json()
         return response
