@@ -1,0 +1,25 @@
+"""
+TODO
+"""
+
+import click
+import logging
+
+@click.group()
+@click.pass_context
+def display(ctx): # pylint: disable=unused-argument
+    """ Commands for displaying information """
+
+    logger = logging.getLogger(ctx.obj['config']['log_level'])
+    logger.setLevel(ctx.obj['config']['log_level'])
+    ctx.obj['logger'] = logger
+
+@display.command()
+@click.option("--page", "-p", default=1, help="Which page to display")
+@click.pass_context
+def inky(ctx, page):
+    """ Display information on Inky ePaper display """
+
+    from frontpage.display.inky import Inky
+    this_inky = Inky(ctx.obj['logger'], ctx.obj['config'], page)
+    print(this_inky.render_page)

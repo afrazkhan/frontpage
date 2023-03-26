@@ -35,3 +35,6 @@ def run(ctx, log_level): # pylint: disable=redefined-outer-name
 
 from frontpage.gather.commands import gather as gather_commands
 run.add_command(gather_commands)
+
+from frontpage.display.commands import display as display_commands
+run.add_command(display_commands)

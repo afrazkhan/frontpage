@@ -5,7 +5,7 @@ TODO
 import click
 import logging
 
-@click.group
+@click.group()
 @click.pass_context
 def gather(ctx): # pylint: disable=unused-argument
     """ Commands for gathering information around the web """
@@ -15,13 +15,14 @@ def gather(ctx): # pylint: disable=unused-argument
     ctx.obj['logger'] = logger
 
 @gather.command()
-@click.option("--country-code", "-c", multiple=True, default=['GB', 'NL'], help="Country code for where to get info from. Can be given multipled times")
+@click.option('--country-code', '-c', multiple=True, default=['GB', 'NL'], help='Country code for where to get info from. Can be given multipled times')
+@click.option('--number-of-items', '-n', default=3, help='Number of items to fetch')
 @click.pass_context
-def google(ctx, country_code):
+def google(ctx, country_code, number_of_items):
     """ Get the latest search trends """
 
     from frontpage.gather.google import Google
-    this_google = Google(ctx.obj['logger'], ctx.obj['config'], country_code)
+    this_google = Google(ctx.obj['logger'], ctx.obj['config'], country_code, number_of_items)
     print(this_google.get_trends())
 
 @gather.command()
@@ -34,3 +35,13 @@ def weather(ctx, city, coords):
     from frontpage.gather.weather import Weather
     this_weather = Weather(ctx.obj['logger'], ctx.obj['config'], city, coords)
     print(this_weather.get_weather())
+
+@gather.command()
+@click.pass_context
+@click.option('--number-of-items', '-n', default=3, help='Number of items to fetch')
+def news(ctx, number_of_items):
+    """ Todays news """
+
+    from frontpage.gather.news import News
+    this_news = News(ctx.obj['logger'], ctx.obj['config'], number_of_items)
+    print(this_news.get_news())
