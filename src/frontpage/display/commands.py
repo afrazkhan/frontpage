@@ -15,11 +15,12 @@ def display(ctx): # pylint: disable=unused-argument
     ctx.obj['logger'] = logger
 
 @display.command()
-@click.option("--page", "-p", default=1, help="Which page to display")
+@click.option('--page', '-p', default='front', type=click.Choice(['front', 'web', 'news', 'weather']), help='Which page to display')
+@click.option('--mock', '-m', is_flag=True, default=False, help='Mock the Inky board, for testing')
 @click.pass_context
-def inky(ctx, page):
+def inky(ctx, page, mock):
     """ Display information on Inky ePaper display """
 
     from frontpage.display.inky import Inky
-    this_inky = Inky(ctx.obj['logger'], ctx.obj['config'], page)
-    print(this_inky.render_page)
+    this_inky = Inky(ctx.obj['logger'], ctx.obj['config'], page, mock)
+    print(this_inky.render_page())

@@ -7,8 +7,8 @@ class Weather():
     def __init__(self, logger, config, city, coords):
         self.logger = logger
         self.config = config
-        self.city = city
-        self.coords = coords
+        self.coords = coords or self.config.get('coords')
+        self.city = city or self.config.get('city')
 
         try:
             self.openweather_token = self.config['openweather_token']
@@ -33,15 +33,12 @@ class Weather():
 
         return coords
 
-    def get_weather(self):
+    def main(self):
         """ Return weather for <city> or <coords>, depending on which is given """
 
-        coords = self.coords or self.config.get('coords')
-        city = self.city or self.config.get('city')
-
-        if coords is None:
+        if self.coords is None:
             self.logger.debug('coords not found in arguments, using get_coords()')
-            coords = self.get_coords(self.config, city)
+            coords = self.get_coords(self.config, self.city)
 
         response = requests.get(f"https://api.openweathermap.org/data/2.5/weather?lat={coords[0]}&lon={coords[1]}&appid={self.openweather_token}&units=metric").json()
         return response

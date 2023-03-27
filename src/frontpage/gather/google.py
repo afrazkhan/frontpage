@@ -6,10 +6,10 @@ class Google():
     def __init__(self, logger, config, country_codes, number_of_items):
         self.logger = logger
         self.config = config
-        self.country_codes = country_codes
-        self.number_of_items = number_of_items
+        self.country_codes = country_codes or config.get('country_codes')
+        self.number_of_items = number_of_items or config.get('number_of_items')
 
-    def get_trends(self):
+    def main(self):
         """ Fetch the first few titles from trending searches """
 
         all_feeds = []

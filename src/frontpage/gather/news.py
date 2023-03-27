@@ -9,7 +9,7 @@ class News():
         self.number_of_items = number_of_items
         self.url = "http://feeds.bbci.co.uk/news/rss.xml"
 
-    def get_news(self):
+    def main(self):
         """ TODO """
 
         results = rss.get_feed(self.url, self.number_of_items)
