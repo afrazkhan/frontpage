@@ -5,6 +5,10 @@ class Inky():
     """ TODO """
 
     def __init__(self, logger, config, page, mock):
+        if config is None:
+            logger.error('This command can only be used with configuration present in ~/.config/frontpage.yaml')
+            logger.error('The only available command line option available is --page')
+
         self.logger = logger
         self.config = config
         self.page = page
@@ -14,8 +18,13 @@ class Inky():
         # else:
         #     from inky import InkyPHAT # pylint: disable=import-error,unused-import
         if not mock:
-            from inky import InkyPHAT # pylint: disable=import-error,unused-import
-            self.display = InkyPHAT('black')
+            try:
+                from inky import InkyPHAT # pylint: disable=import-error,unused-import
+                self.display = InkyPHAT('black')
+            except ModuleNotFoundError:
+                logger.error('Non-linux systems are not supported, though you can pass --mock to only generate the image')
+                import sys
+                sys.exit(1)
 
         self.dimensions = (600, 448)
         self.image = Image.new('RGB', self.dimensions, 'black')
