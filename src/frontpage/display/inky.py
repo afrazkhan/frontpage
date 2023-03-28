@@ -1,5 +1,7 @@
-from PIL import Image, ImageDraw
-from jinja2 import Environment, FileSystemLoader, PackageLoader
+from PIL import Image, ImageDraw, ImageFont
+from jinja2 import Environment, PackageLoader
+import textwrap
+from html import unescape
 
 class Inky():
     """ TODO """
@@ -27,13 +29,13 @@ class Inky():
                 sys.exit(1)
 
         self.dimensions = (600, 448)
-        self.image = Image.new('RGB', self.dimensions, 'black')
+        self.image = Image.new('RGB', self.dimensions, 'white')
+        self.font = ImageFont.truetype('/System/Library/Fonts/Supplemental/Times New Roman.ttf', 14)
         self.draw = ImageDraw.Draw(self.image)
-
         self.templates = Environment(loader=PackageLoader('frontpage.display', 'templates/'), trim_blocks=True, lstrip_blocks=True)
 
 
-    def create_image(self, coords, text, filename=None):
+    def create_image(self, coords: tuple, text: str, filename: str = None):
         """ Write <text> at <coords>, and save to <filename> """
 
         filename = filename or './current_happenings.png'
@@ -49,15 +51,15 @@ class Inky():
 
             from frontpage.gather.google import Google
             this_google = Google(self.logger, self.config, self.config['country_codes'], self.config['number_of_items'])
-            web_trends = this_google.main()
+            web_trends = unescape(this_google.main())
 
             from frontpage.gather.news import News
             this_news = News(self.logger, self.config, 2)
-            the_news = this_news.main()
+            the_news = unescape(this_news.main())
 
             from frontpage.gather.weather import Weather
             this_weather = Weather(self.logger, self.config, self.config.get('city'), self.config.get('coords'))
-            the_weather = this_weather.main()
+            the_weather = unescape(this_weather.main())
 
             rendered_page = page.render({
                 'web_trends': web_trends,
@@ -65,4 +67,18 @@ class Inky():
                 'weather': the_weather
             })
 
-            print(rendered_page)
+            self.create_image((5,5), rendered_page)
+
+    def temporary_debugging(self):
+        """ Delete me :) """
+
+        web_trends = [{'NL': [{'title': 'Van Kooten en De Bie', 'summary': 'De VPRO gaat maandagavond een speciale uitzending over Van Kooten en De Bie herhalen, als eerbetoon aan de overleden komiek en schrijver Wim de Bie (83).'}, {'title': 'Gibraltar', 'summary': 'Traditiegetrouw blikt VI aan de hand van cijfers en feiten vooruit op het EK-kwalificatieduel van Oranje van maandagavond met Gibraltar.'}, {'title': 'Micha Wertheim', 'summary': 'Cabaretier Micha Wertheim gaat voor omroep BNNVara de oudejaarsconference 2023 verzorgen. Een traditionele &#39;oudejaars&#39; à la Wim Kan, Freek de Jonge...'}]}]
+        page = self.templates.get_template("frontpage.j2")
+        rendered_page = unescape(page.render({'web_trends': web_trends}))
+        import pdb; pdb.set_trace() # pylint: disable=multiple-statements,no-member
+
+
+    def main(self):
+        """ Main method for this class """
+
+        self.render_page()

@@ -20,7 +20,7 @@ logger.setLevel(log_level)
 config = configuration.get_config(logger)
 
 @click.group()
-@click.option('-l', '--log-level', default='ERROR', help='How much logging to show', type=click.Choice(['DEBUG', 'WARN', 'ERROR', 'CRIT']))
+@click.option('-l', '--log-level', default='ERROR', help='How much logging to show', type=click.Choice(['DEBUG', 'WARN', 'ERROR', 'CRIT', 'INFO']))
 @click.pass_context
 def run(ctx, log_level): # pylint: disable=redefined-outer-name
     """
