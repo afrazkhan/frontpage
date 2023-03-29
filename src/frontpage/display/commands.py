@@ -21,10 +21,7 @@ def display(ctx): # pylint: disable=unused-argument
 def inky(ctx, page, mock):
     """ Display information on Inky ePaper display """
 
-    try:
-        from frontpage.display.inky import Inky
-        this_inky = Inky(ctx.obj['logger'], ctx.obj['config'], page, mock)
-        this_inky.main()
-        ctx.obj['logger'].info(f"Successfully created image")
-    except Exception as e:
-        ctx.obj['logger'].error(f"Something bad happened: {e}")
+    from frontpage.display.inky import Inky
+    this_inky = Inky(ctx.obj['logger'], ctx.obj['config'], page, mock)
+    this_inky.main()
+    ctx.obj['logger'].info(f"Successfully created image")
