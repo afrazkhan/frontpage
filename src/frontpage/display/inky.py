@@ -1,6 +1,7 @@
 from PIL import Image, ImageDraw, ImageFont
 from jinja2 import Environment, PackageLoader
 from html import unescape
+import importlib.resources as resources
 
 class Inky():
     """ TODO """
@@ -26,17 +27,21 @@ class Inky():
 
         self.dimensions = (600, 448)
         self.image = Image.new('RGB', self.dimensions, 'white')
+        # TODO
         self.font = ImageFont.truetype('/System/Library/Fonts/Supplemental/Times New Roman.ttf', 14)
         self.draw = ImageDraw.Draw(self.image)
         self.templates = Environment(loader=PackageLoader('frontpage.display', 'templates/'), trim_blocks=True, lstrip_blocks=True)
 
 
-    def create_image(self, coords: tuple, text: str, filename: str = None):
+    def create_image(self, text_coords: tuple, text: str, weather_icon: str, filename: str = None):
         """ Write <text> at <coords>, and save to <filename> """
 
         filename = filename or './current_happenings.png'
 
-        self.draw.multiline_text(coords, text, font=self.font, fill=(0, 0, 0))
+        self.draw.multiline_text(text_coords, text, font=self.font, fill=(0, 0, 0))
+        with resources.path('frontpage.display.icons', f"{weather_icon}.png") as path:
+            weather_icon_image = Image.open(path, 'r')
+        self.image.paste(weather_icon_image, (390, 240), mask=weather_icon_image)
         self.image.save(filename)
 
     def fit_display(self, text: str, font: ImageFont, dimensions: tuple, padding: int = 5) -> str:
@@ -96,7 +101,7 @@ class Inky():
 
             formatted_page = self.fit_display(rendered_page, self.font, self.dimensions)
 
-            self.create_image((5,5), formatted_page)
+            self.create_image((5,5), formatted_page, weather_icon=the_weather['weather'][0]['icon'])
 
     def main(self):
         """ Main method for this class """
