@@ -27,8 +27,8 @@ class Inky():
 
         self.dimensions = (600, 448)
         self.image = Image.new('RGB', self.dimensions, 'white')
-        # TODO
-        self.font = ImageFont.truetype('/System/Library/Fonts/Supplemental/Times New Roman.ttf', 14)
+        with resources.path('resources', 'Times New Roman.ttf') as path:
+            self.font = ImageFont.truetype(str(path), 14)
         self.draw = ImageDraw.Draw(self.image)
         self.templates = Environment(loader=PackageLoader('frontpage.display', 'templates/'), trim_blocks=True, lstrip_blocks=True)
 
@@ -39,7 +39,7 @@ class Inky():
         filename = filename or './current_happenings.png'
 
         self.draw.multiline_text(text_coords, text, font=self.font, fill=(0, 0, 0))
-        with resources.path('frontpage.display.icons', f"{weather_icon}.png") as path:
+        with resources.path('resources.icons', f"{weather_icon}.png") as path:
             weather_icon_image = Image.open(path, 'r')
         self.image.paste(weather_icon_image, (390, 240), mask=weather_icon_image)
         self.image.save(filename)
@@ -84,13 +84,13 @@ class Inky():
             this_google = Google(self.logger, self.config, self.config['country_codes'], self.config['number_of_items'])
             web_trends = unescape(this_google.main())
 
-            from frontpage.gather.news import News
-            this_news = News(self.logger, self.config, 2)
-            the_news = unescape(this_news.main())
-
             from frontpage.gather.weather import Weather
             this_weather = Weather(self.logger, self.config, self.config.get('city'), self.config.get('coords'))
             the_weather = unescape(this_weather.main())
+
+            from frontpage.gather.news import News
+            this_news = News(self.logger, self.config, 2)
+            the_news = unescape(this_news.main())
 
             page = self.templates.get_template("frontpage.j2")
             rendered_page = page.render({
