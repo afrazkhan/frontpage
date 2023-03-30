@@ -1,12 +1,15 @@
-Web Trends
-
 {% for this_item in web_trends %}
   {% for this_country, these_stories in this_item.items() %}
   {# {{ this_country }} #}
   {% for this_story in these_stories %}
-    **{{ this_story['title'] }}**
+    {{ this_story['title'] }}
     {{ this_story['summary'] }}
 
   {% endfor %}
   {% endfor %}
 {% endfor %}
+
+
+Temperature: {{ weather['main']['temp'] }}, Feels like: {{ weather['main']['feels_like'] }}
+    - Min/Max: {{ weather['main']['temp_min'] }} / {{ weather['main']['temp_max'] }}
+Wind: {{ weather['wind']['speed'] }} mps

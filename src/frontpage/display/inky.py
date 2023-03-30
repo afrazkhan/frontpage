@@ -14,6 +14,7 @@ class Inky():
         self.logger = logger
         self.config = config
         self.page = page
+        self.mock = mock
 
         try:
             if mock:
@@ -27,22 +28,33 @@ class Inky():
 
         self.dimensions = (600, 448)
         self.image = Image.new('RGB', self.dimensions, 'white')
+        with resources.path('resources', 'Academy Engraved LET Fonts.ttf') as path:
+            self.title_font = ImageFont.truetype(str(path), 40)
         with resources.path('resources', 'Times New Roman.ttf') as path:
             self.font = ImageFont.truetype(str(path), 14)
+            self.subtitle_font = ImageFont.truetype(str(path), 20)
         self.draw = ImageDraw.Draw(self.image)
         self.templates = Environment(loader=PackageLoader('frontpage.display', 'templates/'), trim_blocks=True, lstrip_blocks=True)
 
 
-    def create_image(self, text_coords: tuple, text: str, weather_icon: str, filename: str = None):
+    def create_image(self, text: str, weather_icon: str, filename: str = None):
         """ Write <text> at <coords>, and save to <filename> """
 
-        filename = filename or './current_happenings.png'
+        # Draw all the hardcoded positioned titles
+        self.draw.text((230, 5), "The Daily", font=self.title_font, fill=(0, 0, 0))
+        self.draw.text((175, 40), "All the news that's fit to print, and lots that's not", font=self.font, align='center', fill=(0, 0, 0))
+        self.draw.text((20, 65), "Web Trends", font=self.subtitle_font, fill=(0, 0, 0))
+        self.draw.text((20, 305), "Weather", font=self.subtitle_font, align='center', fill=(0, 0, 0))
 
-        self.draw.multiline_text(text_coords, text, font=self.font, fill=(0, 0, 0))
+        # Fill in the text
+        self.draw.multiline_text((20, 100), text, font=self.font, fill=(0, 0, 0))
+
         with resources.path('resources.icons', f"{weather_icon}.png") as path:
-            weather_icon_image = Image.open(path, 'r')
-        self.image.paste(weather_icon_image, (390, 240), mask=weather_icon_image)
-        self.image.save(filename)
+            with Image.open(path, 'r') as image:
+                weather_icon_image = image.resize((100, 100))
+        self.image.paste(weather_icon_image, (465, 320), mask=weather_icon_image)
+
+        self.image.save(filename or './current_happenings.png')
 
     def fit_display(self, text: str, font: ImageFont, dimensions: tuple, padding: int = 5) -> str:
         """
@@ -79,6 +91,15 @@ class Inky():
     def render_page(self):
         """ Render a page """
 
+        if self.mock:
+            with resources.path('resources', 'sample_text.txt') as path:
+                with open(path, 'r') as file:
+                    formatted_page = file.read()
+
+            self.create_image(formatted_page, weather_icon='01d')
+
+            return
+
         if self.page == 'front':
             from frontpage.gather.google import Google
             this_google = Google(self.logger, self.config, self.config['country_codes'], self.config['number_of_items'])
@@ -100,8 +121,9 @@ class Inky():
             })
 
             formatted_page = self.fit_display(rendered_page, self.font, self.dimensions)
+            print(formatted_page)
 
-            self.create_image((5,5), formatted_page, weather_icon=the_weather['weather'][0]['icon'])
+            self.create_image(formatted_page, weather_icon=the_weather['weather'][0]['icon'])
 
     def main(self):
         """ Main method for this class """
