@@ -2,6 +2,7 @@ from PIL import Image, ImageDraw, ImageFont
 from jinja2 import Environment, PackageLoader
 from html import unescape
 import importlib.resources as resources
+import datetime
 
 class Inky():
     """ TODO """
@@ -22,7 +23,7 @@ class Inky():
             else:
                 from inky import InkyPHAT # pylint: disable=import-error,unused-import
 
-            self.display = InkyPHAT('white')
+            self.display = InkyPHAT('red')
         except ModuleNotFoundError:
             logger.warning('Non-linux systems are not supported. We will only generate the image to be displayed')
 
@@ -37,12 +38,26 @@ class Inky():
         self.templates = Environment(loader=PackageLoader('frontpage.display', 'templates/'), trim_blocks=True, lstrip_blocks=True)
 
 
-    def create_image(self, text: str, weather_icon: str, filename: str = None):
-        """ Write <text> at <coords>, and save to <filename> """
+    def draw_global_titles(self):
+        """
+        Draw all the hardcoded positioned titles that go at the to of all pages
+        """
 
-        # Draw all the hardcoded positioned titles
-        self.draw.text((230, 5), "The Daily", font=self.title_font, fill=(0, 0, 0))
-        self.draw.text((175, 40), "All the news that's fit to print, and lots that's not", font=self.font, align='center', fill=(0, 0, 0))
+        title = "The Daily Pantaloon"
+        blurb = "All the news that's fit to print, and lots that's not"
+        now = datetime.datetime.now()
+        title_size = self.draw.textsize(title, font=self.title_font)
+        self.draw.text(((self.dimensions[0]-title_size[0])/2, 5), title, font=self.title_font, fill=(0, 0, 0))
+        blurb_size = self.draw.textsize(blurb, font=self.font)
+        self.draw.text(((self.dimensions[0]-blurb_size[0])/2, 40), blurb, font=self.font, align='center', fill=(0, 0, 0))
+        self.draw.text((465, 40), now.strftime('%A %e %b %Y'), font=self.font, align='center', fill=(0, 0, 0))
+
+    def draw_frontpage(self, text: str, weather_icon: str, filename: str = None):
+        """ Fill in the frontpage, and save it to a PNG """
+
+        self.draw_global_titles()
+
+        # Draw the hardcoded titles for the frontpage
         self.draw.text((20, 65), "Web Trends", font=self.subtitle_font, fill=(0, 0, 0))
         self.draw.text((20, 305), "Weather", font=self.subtitle_font, align='center', fill=(0, 0, 0))
 
@@ -54,7 +69,7 @@ class Inky():
                 weather_icon_image = image.resize((100, 100))
         self.image.paste(weather_icon_image, (465, 320), mask=weather_icon_image)
 
-        self.image.save(filename or './current_happenings.png')
+        self.image.save(filename or '/tmp/current_happenings.png')
 
     def fit_display(self, text: str, font: ImageFont, dimensions: tuple, padding: int = 5) -> str:
         """
@@ -77,8 +92,8 @@ class Inky():
                 text_line = []
                 continue
             text_line.append(word)
-            w, h = font.getsize(' '.join(text_line))
-            if w > max_width:
+            space_size = font.getsize(' '.join(text_line))
+            if space_size[0] > max_width:
                 text_line.pop()
                 text_lines.append(' '.join(text_line))
                 text_line = [word]
@@ -96,7 +111,7 @@ class Inky():
                 with open(path, 'r') as file:
                     formatted_page = file.read()
 
-            self.create_image(formatted_page, weather_icon='01d')
+            self.draw_frontpage(formatted_page, weather_icon='01d')
 
             return
 
@@ -123,9 +138,14 @@ class Inky():
             formatted_page = self.fit_display(rendered_page, self.font, self.dimensions)
             print(formatted_page)
 
-            self.create_image(formatted_page, weather_icon=the_weather['weather'][0]['icon'])
+            self.draw_frontpage(formatted_page, weather_icon=the_weather['weather'][0]['icon'])
 
     def main(self):
         """ Main method for this class """
 
         self.render_page()
+
+        try:
+            self.display.set_image('/tmp/current_happenings.png')
+        except Exception:
+            self.logger.warning("Not talking to Inky actual, because we're not on Linux")
