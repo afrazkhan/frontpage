@@ -1,7 +1,7 @@
 from PIL import Image, ImageDraw, ImageFont
 from jinja2 import Environment, PackageLoader
 from html import unescape
-import importlib.resources as resources
+from importlib import resources
 import datetime
 
 class InkyDisplay():
@@ -19,12 +19,9 @@ class InkyDisplay():
         self.image_location = '/tmp/current_happenings.png'
 
         try:
-            if mock:
-                from inky import InkyMockPHAT as InkyPHAT # pylint: disable=import-error,unused-import
-            else:
-                from inky import InkyPHAT # pylint: disable=import-error,unused-import
+            from inky.auto import auto # pylint: disable=import-error,unused-import
+            self.display = auto(ask_user=True)
 
-            self.display = InkyPHAT('red')
         except ModuleNotFoundError:
             logger.warning('Non-linux systems are not supported. We will only generate the image to be displayed')
 
@@ -145,7 +142,8 @@ class InkyDisplay():
         self.render_page()
 
         try:
-            self.display.set_image(self.image_location)
+            self.display.set_image(self.image)
+            self.display.show()
         except AttributeError:
             self.logger.warning(f"""Not talking to Inky actual, because we're not on Linux. The image file has still
 been written out to {self.image_location} though""")
