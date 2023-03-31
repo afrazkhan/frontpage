@@ -4,7 +4,7 @@ from html import unescape
 import importlib.resources as resources
 import datetime
 
-class Inky():
+class InkyDisplay():
     """ TODO """
 
     def __init__(self, logger, config, page, mock):
