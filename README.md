@@ -1,29 +1,25 @@
-[ADD weather](https://openweathermap.org/current)
-
-<!-- These are examples of badges you might want to add to your README:
-     please update the URLs accordingly
-
-[![Built Status](https://api.cirrus-ci.com/github/<USER>/frontpage.svg?branch=main)](https://cirrus-ci.com/github/<USER>/frontpage)
-[![ReadTheDocs](https://readthedocs.org/projects/frontpage/badge/?version=latest)](https://frontpage.readthedocs.io/en/stable/)
-[![Coveralls](https://img.shields.io/coveralls/github/<USER>/frontpage/main.svg)](https://coveralls.io/r/<USER>/frontpage)
-[![PyPI-Server](https://img.shields.io/pypi/v/frontpage.svg)](https://pypi.org/project/frontpage/)
-[![Conda-Forge](https://img.shields.io/conda/vn/conda-forge/frontpage.svg)](https://anaconda.org/conda-forge/frontpage)
-[![Monthly Downloads](https://pepy.tech/badge/frontpage/month)](https://pepy.tech/project/frontpage)
-[![Twitter](https://img.shields.io/twitter/url/http/shields.io.svg?style=social&label=Twitter)](https://twitter.com/frontpage)
--->
-
 [![Project generated with PyScaffold](https://img.shields.io/badge/-PyScaffold-005CA0?logo=pyscaffold)](https://pyscaffold.org/)
 
-# frontpage
+# Frontpage
 
-> Add a short description here!
+> Application for displaying newspaper style pages on a 7" Inky Impression
 
-A longer description of your project goes here...
+Creates newspaper style pages for the [Inky Impression 5.7" ePaper display](https://shop.pimoroni.com/products/inky-impression-5-7) (currently only a frontpage). Designed to be used with something like a cronjob which would refresh the page for you every n hours, or the buttons on the side (not ready yet).
 
+Bear in mind that whilst it would be easy to make the dimensions of the display options to be specified in the CLI, the way in which the pages are rendered — using hardcoded positions for the section titles — means this wouldn't be useful. For this reason, it's specifically designed to be used with the 5.7" version of the display.
 
-<!-- pyscaffold-notes -->
+## Usage
 
-## Note
+The CLI is documents itself well, but the quickstart (presuming you've [set up your Raspberry Pi for use with the Inky device](https://github.com/pimoroni/inky#installation already) is:
 
-This project has been set up using PyScaffold 4.3.1. For details and usage
-information on PyScaffold see https://pyscaffold.org/.
+1. Create a configuration file at `~/.config/frontpage.yaml` (see the [sample file](./sample_configuration.yaml)). For the `openweather_token`, you don't need to subscribe to anything, a personal account with a token generated on [this page](https://home.openweathermap.org/api_keys) is enough
+1. `pip install .`
+1. `fp display inky`
+
+This will display the frontpage by default, which is an overview of information available in greater detail on the dedicated pages.
+
+The option for displaying the other pages is `-p`, but those are not yet implemented. You can still see the information they would provide with:
+
+```shell
+fp gather [google | news | weather]
+```

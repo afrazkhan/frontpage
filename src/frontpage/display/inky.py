@@ -16,6 +16,7 @@ class Inky():
         self.config = config
         self.page = page
         self.mock = mock
+        self.image_location = '/tmp/current_happenings.png'
 
         try:
             if mock:
@@ -69,7 +70,7 @@ class Inky():
                 weather_icon_image = image.resize((100, 100))
         self.image.paste(weather_icon_image, (465, 320), mask=weather_icon_image)
 
-        self.image.save(filename or '/tmp/current_happenings.png')
+        self.image.save(filename or self.image_location)
 
     def fit_display(self, text: str, font: ImageFont, dimensions: tuple, padding: int = 5) -> str:
         """
@@ -136,8 +137,6 @@ class Inky():
             })
 
             formatted_page = self.fit_display(rendered_page, self.font, self.dimensions)
-            print(formatted_page)
-
             self.draw_frontpage(formatted_page, weather_icon=the_weather['weather'][0]['icon'])
 
     def main(self):
@@ -146,6 +145,7 @@ class Inky():
         self.render_page()
 
         try:
-            self.display.set_image('/tmp/current_happenings.png')
-        except Exception:
-            self.logger.warning("Not talking to Inky actual, because we're not on Linux")
+            self.display.set_image(self.image_location)
+        except AttributeError:
+            self.logger.warning(f"""Not talking to Inky actual, because we're not on Linux. The image file has still
+been written out to {self.image_location} though""")

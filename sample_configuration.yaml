@@ -1,0 +1,6 @@
+log_level: ERROR
+openweather_token: thesecrettokenfromopenweathercom
+city: Delft
+country_codes:
+  - NL
+number_of_items: 3
